@@ -5,6 +5,7 @@ import { NotificationJobData } from '../lib/queue';
 const mockPrismaMessage = {
   count: jest.fn(),
   update: jest.fn(),
+  findUnique: jest.fn(),
 };
 
 const mockPrismaCampaign = {
@@ -143,6 +144,7 @@ describe('processNotificationJob', () => {
   });
 
   it('should update message to "sent" and increment sentCount on success', async () => {
+    mockPrismaMessage.findUnique.mockResolvedValue({ sentAt: null }); // not yet sent
     mockPrismaMessage.update.mockResolvedValue({});
     mockPrismaCampaign.update.mockResolvedValue({});
     mockPrismaCampaign.findUnique.mockResolvedValue({ name: 'Test Campaign' });
@@ -154,6 +156,7 @@ describe('processNotificationJob', () => {
       where: { id: 'msg-1' },
       data: {
         status: 'sent',
+        sentAt: expect.any(Date),
         attempts: 1, // attemptsMade (0) + 1
       },
     });
@@ -165,6 +168,7 @@ describe('processNotificationJob', () => {
   });
 
   it('should update message to "queued" and rethrow on failure with retries remaining', async () => {
+    mockPrismaMessage.findUnique.mockResolvedValue({ sentAt: null }); // not yet sent
     mockSendEmail.mockRejectedValue(new Error('Failed to deliver notification'));
     mockPrismaMessage.update.mockResolvedValue({});
     mockPrismaCampaign.findUnique.mockResolvedValue({ name: 'Test Campaign' });
@@ -189,6 +193,7 @@ describe('processNotificationJob', () => {
   });
 
   it('should update message to "failed" on final attempt failure', async () => {
+    mockPrismaMessage.findUnique.mockResolvedValue({ sentAt: null }); // not yet sent
     mockSendEmail.mockRejectedValue(new Error('Failed'));
     mockPrismaMessage.update.mockResolvedValue({});
     mockPrismaCampaign.findUnique.mockResolvedValue({ name: 'Test Campaign' });
@@ -208,6 +213,7 @@ describe('processNotificationJob', () => {
   });
 
   it('should rethrow the error to let BullMQ handle retries', async () => {
+    mockPrismaMessage.findUnique.mockResolvedValue({ sentAt: null }); // not yet sent
     mockSendEmail.mockRejectedValue(new Error('Random failure'));
     mockPrismaMessage.update.mockResolvedValue({});
     mockPrismaCampaign.findUnique.mockResolvedValue({ name: 'Test Campaign' });

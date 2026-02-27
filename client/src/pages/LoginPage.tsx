@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import styles from './LoginPage.module.css';
 
@@ -90,17 +90,6 @@ export default function LoginPage() {
             {isLoading ? 'Signing in…' : 'Sign In'}
           </button>
 
-          <div className={styles.credentials}>
-            <strong>Demo credentials:</strong><br />
-            admin@notifq.dev / admin123
-          </div>
-
-          <div className={styles.credentials}>
-            No account yet?{' '}
-            <Link to="/register" style={{ color: 'var(--accent-primary)', fontWeight: 600 }}>
-              Create one
-            </Link>
-          </div>
         </form>
       </div>
     </div>

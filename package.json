@@ -11,7 +11,8 @@
     "start:worker": "node dist/worker.js",
     "db:migrate": "npx prisma migrate dev",
     "db:studio": "npx prisma studio",
-    "test": "jest --forceExit --detectOpenHandles"
+    "test": "jest --forceExit --detectOpenHandles",
+    "seed:admin": "ts-node scripts/seed-admin.ts"
   },
   "keywords": [],
   "author": "",
