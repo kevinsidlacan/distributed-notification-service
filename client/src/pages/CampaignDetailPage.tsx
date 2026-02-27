@@ -25,9 +25,8 @@ export default function CampaignDetailPage() {
   useEffect(() => {
     fetchCampaign();
 
-    const isActive = (status: string) => status === 'processing' || status === 'pending';
     const interval = setInterval(() => {
-      if (campaign && isActive(campaign.status)) {
+      if (campaign?.status === 'processing' || campaign?.status === 'pending') {
         fetchCampaign();
       }
     }, 2000);

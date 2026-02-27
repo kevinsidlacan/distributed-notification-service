@@ -21,9 +21,21 @@ export default function CampaignListPage() {
   }, []);
 
   useEffect(() => {
-    fetchCampaigns();
-    const interval = setInterval(fetchCampaigns, 5000);
-    return () => clearInterval(interval);
+    let isMounted = true;
+    
+    // Initial fetch - wrap in an async IIFE to avoid direct state updates inside the effect body
+    (async () => {
+      if (isMounted) await fetchCampaigns();
+    })();
+    
+    const interval = setInterval(() => {
+      if (isMounted) fetchCampaigns();
+    }, 5000);
+    
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
   }, [fetchCampaigns]);
 
   const formatDate = (iso: string) => {
@@ -34,6 +46,15 @@ export default function CampaignListPage() {
       minute: '2-digit',
     });
   };
+
+  const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all');
+
+  const filteredCampaigns = campaigns.filter((c) => {
+    const isActive = c.status === 'pending' || c.status === 'processing';
+    if (filter === 'active') return isActive;
+    if (filter === 'completed') return !isActive;
+    return true;
+  });
 
   return (
     <div>
@@ -52,11 +73,32 @@ export default function CampaignListPage() {
         </button>
       </div>
 
+      <div className={styles.filterBar}>
+        <button 
+          className={`${styles.filterBtn} ${filter === 'all' ? styles.filterBtnActive : ''}`}
+          onClick={() => setFilter('all')}
+        >
+          All
+        </button>
+        <button 
+          className={`${styles.filterBtn} ${filter === 'active' ? styles.filterBtnActive : ''}`}
+          onClick={() => setFilter('active')}
+        >
+          Active
+        </button>
+        <button 
+          className={`${styles.filterBtn} ${filter === 'completed' ? styles.filterBtnActive : ''}`}
+          onClick={() => setFilter('completed')}
+        >
+          Completed
+        </button>
+      </div>
+
       <div className={styles.table}>
-        {campaigns.length === 0 ? (
+        {filteredCampaigns.length === 0 ? (
           <div className={styles.empty}>
             <div className={styles.emptyIcon}>📭</div>
-            No campaigns yet. Create your first one!
+            No campaigns found matching this filter.
           </div>
         ) : (
           <table>
@@ -71,7 +113,7 @@ export default function CampaignListPage() {
               </tr>
             </thead>
             <tbody>
-              {campaigns.map((c) => (
+              {filteredCampaigns.map((c) => (
                 <tr
                   key={c.id}
                   className={styles.clickableRow}

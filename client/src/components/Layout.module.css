@@ -81,3 +81,28 @@
   padding: 32px 40px;
   max-width: 1200px;
 }
+
+.sidebarFooter {
+  margin-top: auto;
+  padding: 12px;
+  border-top: 1px solid var(--bg-sidebar-hover);
+}
+
+.logoutButton {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-sidebar);
+  background: none;
+  transition: all 0.15s ease;
+}
+
+.logoutButton:hover {
+  background: var(--bg-sidebar-hover);
+  color: var(--status-error);
+}

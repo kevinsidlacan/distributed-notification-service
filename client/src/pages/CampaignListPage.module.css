@@ -34,6 +34,40 @@
   background: var(--accent-primary-hover);
 }
 
+.filterBar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.filterBtn {
+  background: transparent;
+  border: 1px solid var(--border-light);
+  color: var(--text-secondary);
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filterBtn:hover {
+  background: var(--bg-sidebar-hover);
+  color: var(--text-primary);
+}
+
+.filterBtnActive {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+  color: var(--text-inverse);
+}
+
+.filterBtnActive:hover {
+  background: var(--accent-primary-hover);
+  color: var(--text-inverse);
+}
+
 .table {
   width: 100%;
   background: var(--bg-card);

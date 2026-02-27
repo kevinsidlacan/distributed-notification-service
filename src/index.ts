@@ -4,6 +4,7 @@ dotenv.config();
 import express from 'express';
 import cors from 'cors';
 import campaignRoutes from './routes/campaigns';
+import authRoutes from './routes/auth';
 
 export const app = express();
 const PORT = process.env.PORT || 3001;
@@ -13,6 +14,7 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
+app.use('/auth', authRoutes);
 app.use('/campaigns', campaignRoutes);
 
 // Health check

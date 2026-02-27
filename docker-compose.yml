@@ -43,6 +43,7 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: 6379
       PORT: 3001
+      JWT_SECRET: dev-secret-change-in-production
     depends_on:
       postgres:
         condition: service_healthy

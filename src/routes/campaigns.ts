@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client';
 import prisma from '../lib/prisma';
 import { enqueueNotifications } from '../lib/queue';
 import { generateRecipients } from '../utils/generateRecipients';
+import { requireAuth } from '../middleware/auth';
 
 const router = Router();
 
@@ -11,7 +12,7 @@ interface CreateCampaignBody {
   recipientCount?: number;
 }
 
-router.post('/', async (req: Request<{}, {}, CreateCampaignBody>, res: Response): Promise<void> => {
+router.post('/', requireAuth, async (req: Request<{}, {}, CreateCampaignBody>, res: Response): Promise<void> => {
   try {
     const { name, recipientCount = 100 } = req.body;
 
@@ -119,7 +120,7 @@ router.get('/:id', async (req: Request<{ id: string }>, res: Response): Promise<
   }
 });
 
-router.post('/:id/retry', async (req: Request<{ id: string }>, res: Response): Promise<void> => {
+router.post('/:id/retry', requireAuth, async (req: Request<{ id: string }>, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
 

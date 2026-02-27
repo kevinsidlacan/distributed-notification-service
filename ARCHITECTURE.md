@@ -64,6 +64,16 @@ Clients can poll `GET /campaigns/:id` to check real-time progress, which returns
 | ORM | Prisma | Type-safe database access and migrations |
 | Containerization | Docker + Docker Compose | Reproducible infrastructure and scaling |
 
+## Security / Authentication
+
+The API and Dashboard are secured using a self-contained **JSON Web Token (JWT)** system to prevent unauthorized campaign creation and potential "Denial of Wallet" resource exhaustion.
+
+### JWT Flow
+1. **Admin Model:** A single `Admin` record is seeded into the database (`admin@notifq.dev`). Passwords are hashed using `bcryptjs` (10 salt rounds).
+2. **Login Generation:** `POST /auth/login` verifies credentials and issues a JWT signed with `JWT_SECRET` (24-hour expiry). 
+3. **Protected Routes:** Mutation endpoints (`POST /campaigns`, `POST /campaigns/:id/retry`) are protected by an Express middleware. Reads remain public.
+4. **Client-side:** The React SPA stores the token in `localStorage` and automatically attaches it as an `Authorization: Bearer <token>` header to protected API requests.
+
 ## Database Schema
 
 ```mermaid
@@ -86,6 +96,13 @@ erDiagram
         int attempts
         string lastError "nullable"
         string campaignId FK
+        datetime createdAt
+        datetime updatedAt
+    }
+    Admin {
+        string id PK "UUID"
+        string email "Unique"
+        string passwordHash
         datetime createdAt
         datetime updatedAt
     }

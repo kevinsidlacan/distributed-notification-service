@@ -34,6 +34,14 @@ jest.mock('../lib/queue', () => ({
   enqueueNotifications: mockEnqueueNotifications,
 }));
 
+// Mock auth middleware to let all requests through as authenticated
+jest.mock('../middleware/auth', () => ({
+  requireAuth: (req: any, res: any, next: any) => {
+    req.adminId = 'mock-admin-id';
+    next();
+  }
+}));
+
 // Import the app AFTER mocks are set up
 import { app } from '../index';
 

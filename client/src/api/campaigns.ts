@@ -1,5 +1,16 @@
 const API_BASE = 'http://localhost:3001';
 
+function getAuthHeaders(): Record<string, string> {
+  const token = localStorage.getItem('auth_token');
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  return headers;
+}
+
 export interface Campaign {
   id: string;
   name: string;
@@ -31,9 +42,14 @@ export async function getCampaignById(id: string): Promise<CampaignDetail> {
 export async function createCampaign(name: string, recipientCount: number): Promise<{ campaignId: string }> {
   const res = await fetch(`${API_BASE}/campaigns`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify({ name, recipientCount }),
   });
+  if (res.status === 401) {
+    localStorage.removeItem('auth_token');
+    window.location.href = '/login';
+    throw new Error('Session expired. Please log in again.');
+  }
   if (!res.ok) throw new Error('Failed to create campaign');
   return res.json();
 }
@@ -41,7 +57,13 @@ export async function createCampaign(name: string, recipientCount: number): Prom
 export async function retryFailedMessages(campaignId: string): Promise<{ retriedCount: number }> {
   const res = await fetch(`${API_BASE}/campaigns/${campaignId}/retry`, {
     method: 'POST',
+    headers: getAuthHeaders(),
   });
+  if (res.status === 401) {
+    localStorage.removeItem('auth_token');
+    window.location.href = '/login';
+    throw new Error('Session expired. Please log in again.');
+  }
   if (!res.ok) throw new Error('Failed to retry messages');
   return res.json();
 }

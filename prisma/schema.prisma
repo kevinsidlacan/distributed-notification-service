@@ -35,3 +35,11 @@ model Message {
   @@index([campaignId])
   @@index([status])
 }
+
+model Admin {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
