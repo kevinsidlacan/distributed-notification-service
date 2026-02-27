@@ -10,11 +10,12 @@ const router = Router();
 interface CreateCampaignBody {
   name: string;
   recipientCount?: number;
+  targetEmail?: string;
 }
 
 router.post('/', requireAuth, async (req: Request<{}, {}, CreateCampaignBody>, res: Response): Promise<void> => {
   try {
-    const { name, recipientCount = 100 } = req.body;
+    const { name, recipientCount = 100, targetEmail } = req.body;
 
     if (!name) {
       res.status(400).json({ error: 'Campaign name is required.' });
@@ -26,7 +27,13 @@ router.post('/', requireAuth, async (req: Request<{}, {}, CreateCampaignBody>, r
       return;
     }
 
-    const recipients = generateRecipients(recipientCount);
+    let recipients = generateRecipients(recipientCount);
+    
+    // If a target test email is provided, ensure it's in the list so a real email goes out
+    if (targetEmail && targetEmail.trim() !== '') {
+      // Add it to the top of the list so it gets processed quickly
+      recipients = [targetEmail.trim(), ...recipients.slice(0, recipientCount - 1)];
+    }
 
     const { campaign, messages } = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const newCampaign = await tx.campaign.create({

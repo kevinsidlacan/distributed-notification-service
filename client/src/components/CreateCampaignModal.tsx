@@ -12,6 +12,7 @@ const PRESETS = [50, 500, 5000, 10000];
 export default function CreateCampaignModal({ onClose, onCreated }: CreateCampaignModalProps) {
   const [name, setName] = useState('');
   const [recipientCount, setRecipientCount] = useState(500);
+  const [targetEmail, setTargetEmail] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -20,7 +21,7 @@ export default function CreateCampaignModal({ onClose, onCreated }: CreateCampai
 
     setLoading(true);
     try {
-      await createCampaign(name.trim(), recipientCount);
+      await createCampaign(name.trim(), recipientCount, targetEmail.trim());
       onCreated();
       onClose();
     } catch (err) {
@@ -68,6 +69,16 @@ export default function CreateCampaignModal({ onClose, onCreated }: CreateCampai
                 </button>
               ))}
             </div>
+          </div>
+          <div className={styles.field}>
+            <label className={styles.label}>Target Test Email (Optional)</label>
+            <input
+              className={styles.input}
+              type="email"
+              placeholder="your@email.com (receives 1 real email via SES)"
+              value={targetEmail}
+              onChange={(e) => setTargetEmail(e.target.value)}
+            />
           </div>
           <div className={styles.actions}>
             <button type="button" className={styles.btnCancel} onClick={onClose}>

@@ -33,8 +33,16 @@ jest.mock('../lib/redis', () => ({
   REDIS_CONNECTION: { host: 'localhost', port: 6379 },
 }));
 
+const mockSendEmail = jest.fn();
+jest.mock('../services/email/EmailServiceFactory', () => ({
+  EmailServiceFactory: {
+    getProvider: jest.fn(() => ({
+      sendEmail: mockSendEmail,
+    })),
+  },
+}));
+
 import {
-  sendNotification,
   updateCampaignProgress,
   processNotificationJob,
 } from './workerFunctions';
@@ -53,50 +61,7 @@ function createMockJob(overrides: Partial<Job<NotificationJobData>> = {}): Job<N
   } as unknown as Job<NotificationJobData>;
 }
 
-describe('sendNotification', () => {
-  beforeEach(() => {
-    jest.useFakeTimers();
-  });
-
-  afterEach(() => {
-    jest.useRealTimers();
-  });
-
-  it('should resolve when Math.random returns above the failure threshold', async () => {
-    jest.spyOn(Math, 'random').mockReturnValue(0.5); // above 0.2
-    const promise = sendNotification('user@example.com');
-    jest.advanceTimersByTime(200);
-    await expect(promise).resolves.toBeUndefined();
-    jest.spyOn(Math, 'random').mockRestore();
-  });
-
-  it('should throw when Math.random returns below the failure threshold', async () => {
-    jest.spyOn(Math, 'random').mockReturnValue(0.1); // below 0.2
-    const promise = sendNotification('user@example.com');
-    jest.advanceTimersByTime(200);
-    await expect(promise).rejects.toThrow(
-      'Failed to deliver notification to user@example.com'
-    );
-    jest.spyOn(Math, 'random').mockRestore();
-  });
-
-  it('should throw when Math.random returns exactly 0', async () => {
-    jest.spyOn(Math, 'random').mockReturnValue(0);
-    const promise = sendNotification('test@test.com');
-    jest.advanceTimersByTime(200);
-    await expect(promise).rejects.toThrow();
-    jest.spyOn(Math, 'random').mockRestore();
-  });
-
-  it('should succeed when Math.random returns exactly the failure threshold', async () => {
-    jest.spyOn(Math, 'random').mockReturnValue(0.2); // === 0.2, not < 0.2
-    const promise = sendNotification('test@test.com');
-    jest.advanceTimersByTime(200);
-    await expect(promise).resolves.toBeUndefined();
-    jest.spyOn(Math, 'random').mockRestore();
-  });
-});
-
+// sendNotification tests removed as logic moved to MockEmailProvider
 describe('updateCampaignProgress', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -171,24 +136,19 @@ describe('updateCampaignProgress', () => {
 describe('processNotificationJob', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    jest.useFakeTimers();
-    // Default: sendNotification succeeds
-    jest.spyOn(Math, 'random').mockReturnValue(0.5);
+    mockSendEmail.mockResolvedValue(undefined);
   });
 
   afterEach(() => {
-    jest.spyOn(Math, 'random').mockRestore();
-    jest.useRealTimers();
   });
 
   it('should update message to "sent" and increment sentCount on success', async () => {
     mockPrismaMessage.update.mockResolvedValue({});
     mockPrismaCampaign.update.mockResolvedValue({});
+    mockPrismaCampaign.findUnique.mockResolvedValue({ name: 'Test Campaign' });
 
     const job = createMockJob();
-    const promise = processNotificationJob(job);
-    jest.advanceTimersByTime(200);
-    await promise;
+    await processNotificationJob(job);
 
     expect(mockPrismaMessage.update).toHaveBeenCalledWith({
       where: { id: 'msg-1' },
@@ -205,15 +165,13 @@ describe('processNotificationJob', () => {
   });
 
   it('should update message to "queued" and rethrow on failure with retries remaining', async () => {
-    jest.spyOn(Math, 'random').mockReturnValue(0.1); // Force failure
+    mockSendEmail.mockRejectedValue(new Error('Failed to deliver notification'));
     mockPrismaMessage.update.mockResolvedValue({});
+    mockPrismaCampaign.findUnique.mockResolvedValue({ name: 'Test Campaign' });
 
     const job = createMockJob({ attemptsMade: 0, opts: { attempts: 3 } } as any);
 
-    const promise = processNotificationJob(job);
-    jest.advanceTimersByTime(200);
-
-    await expect(promise).rejects.toThrow(
+    await expect(processNotificationJob(job)).rejects.toThrow(
       'Failed to deliver notification'
     );
 
@@ -231,15 +189,13 @@ describe('processNotificationJob', () => {
   });
 
   it('should update message to "failed" on final attempt failure', async () => {
-    jest.spyOn(Math, 'random').mockReturnValue(0.1); // Force failure
+    mockSendEmail.mockRejectedValue(new Error('Failed'));
     mockPrismaMessage.update.mockResolvedValue({});
+    mockPrismaCampaign.findUnique.mockResolvedValue({ name: 'Test Campaign' });
 
     const job = createMockJob({ attemptsMade: 2, opts: { attempts: 3 } } as any);
 
-    const promise = processNotificationJob(job);
-    jest.advanceTimersByTime(200);
-
-    await expect(promise).rejects.toThrow();
+    await expect(processNotificationJob(job)).rejects.toThrow();
 
     expect(mockPrismaMessage.update).toHaveBeenCalledWith({
       where: { id: 'msg-1' },
@@ -252,13 +208,12 @@ describe('processNotificationJob', () => {
   });
 
   it('should rethrow the error to let BullMQ handle retries', async () => {
-    jest.spyOn(Math, 'random').mockReturnValue(0.1);
+    mockSendEmail.mockRejectedValue(new Error('Random failure'));
     mockPrismaMessage.update.mockResolvedValue({});
+    mockPrismaCampaign.findUnique.mockResolvedValue({ name: 'Test Campaign' });
 
     const job = createMockJob();
-    const promise = processNotificationJob(job);
-    jest.advanceTimersByTime(200);
 
-    await expect(promise).rejects.toThrow(Error);
+    await expect(processNotificationJob(job)).rejects.toThrow(Error);
   });
 });

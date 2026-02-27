@@ -39,11 +39,11 @@ export async function getCampaignById(id: string): Promise<CampaignDetail> {
   return res.json();
 }
 
-export async function createCampaign(name: string, recipientCount: number): Promise<{ campaignId: string }> {
+export async function createCampaign(name: string, recipientCount: number, targetEmail?: string): Promise<{ campaignId: string }> {
   const res = await fetch(`${API_BASE}/campaigns`, {
     method: 'POST',
     headers: getAuthHeaders(),
-    body: JSON.stringify({ name, recipientCount }),
+    body: JSON.stringify({ name, recipientCount, targetEmail }),
   });
   if (res.status === 401) {
     localStorage.removeItem('auth_token');

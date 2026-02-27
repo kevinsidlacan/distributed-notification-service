@@ -2,18 +2,9 @@ import { Job } from 'bullmq';
 import { NotificationJobData } from '../lib/queue';
 import prisma from '../lib/prisma';
 
-const FAILURE_RATE = 0.2;
-const SIMULATED_LATENCY_MS = 200;
+import { EmailServiceFactory } from '../services/email/EmailServiceFactory';
 
-export async function sendNotification(recipient: string): Promise<void> {
-  // Simulate network latency
-  await new Promise((resolve) => setTimeout(resolve, SIMULATED_LATENCY_MS));
-
-  // Simulate random failures
-  if (Math.random() < FAILURE_RATE) {
-    throw new Error(`Failed to deliver notification to ${recipient}`);
-  }
-}
+// The old sendNotification was moved to MockEmailProvider.
 
 export async function updateCampaignProgress(campaignId: string): Promise<void> {
   const pendingCount = await prisma.message.count({
@@ -44,7 +35,15 @@ export async function processNotificationJob(job: Job<NotificationJobData>): Pro
   const { messageId, campaignId, recipient } = job.data;
 
   try {
-    await sendNotification(recipient);
+    const campaign = await prisma.campaign.findUnique({ where: { id: campaignId } });
+    const subject = campaign ? `Notification: ${campaign.name}` : 'Notification';
+
+    const provider = EmailServiceFactory.getProvider(recipient);
+    await provider.sendEmail(
+      recipient,
+      subject,
+      `Hello ${recipient},\n\nThis is a notification from the Distributed Notification Service.\n\nCampaign ID: ${campaignId}\nMessage ID: ${messageId}`
+    );
 
     await prisma.message.update({
       where: { id: messageId },

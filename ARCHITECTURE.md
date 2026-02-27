@@ -147,6 +147,15 @@ Campaign and message creation happens within a single PostgreSQL transaction. If
 
 The worker handles `SIGTERM` and `SIGINT` signals, allowing in-flight jobs to complete before shutting down. This prevents message loss during deployments or container restarts.
 
+## Email Service Integration
+
+To actually deliver notifications, the system implements the **Strategy/Factory Pattern** via `EmailServiceFactory`. This is crucial for avoiding massive AWS bills during load testing.
+
+1. **Mock Email Provider**: Any recipient ending in `@example.com` is routed here. It simulates network latency and a 20% failure rate but does not make any actual network requests.
+2. **AWS SES Provider**: Any real email address provided via the dashboard is routed to the `@aws-sdk/client-ses` integration, which uses `SendEmailCommand` to dispatch genuine emails via AWS Simple Email Service.
+
+This provides the ability to simulate 100,000 parallel sends while safely sending exactly 1 real email for verification.
+
 ## Project Structure
 
 ```
