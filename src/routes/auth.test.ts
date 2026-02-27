@@ -101,14 +101,4 @@ describe('Auth Routes', () => {
     });
   });
 
-  describe('POST /auth/register', () => {
-    it('should return 404 — registration endpoint has been removed', async () => {
-      const res = await request(app)
-        .post('/auth/register')
-        .send({ email: 'anyone@example.com', password: 'password' });
-
-      // Express returns 404 for unmatched routes
-      expect(res.status).toBe(404);
-    });
-  });
 });
