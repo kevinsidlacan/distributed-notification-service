@@ -5,9 +5,10 @@ import styles from './LoginPage.module.css';
 
 const API_BASE = 'http://localhost:3001';
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -17,10 +18,16 @@ export default function LoginPage() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError('');
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      const res = await fetch(`${API_BASE}/auth/login`, {
+      const res = await fetch(`${API_BASE}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -29,10 +36,11 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || 'Login failed.');
+        setError(data.error || 'Registration failed.');
         return;
       }
 
+      // Auto-login after successful registration (backend returns a token directly)
       login(data.token);
       navigate('/', { replace: true });
     } catch {
@@ -48,16 +56,16 @@ export default function LoginPage() {
         <div className={styles.logo}>
           <div className={styles.logoIcon}>⚡</div>
           <div className={styles.logoTitle}>NotifQ</div>
-          <div className={styles.logoSubtitle}>Sign in to your dashboard</div>
+          <div className={styles.logoSubtitle}>Create an admin account</div>
         </div>
 
         <form className={styles.form} onSubmit={handleSubmit}>
           {error && <div className={styles.error}>{error}</div>}
 
           <div className={styles.fieldGroup}>
-            <label className={styles.label} htmlFor="login-email">Email</label>
+            <label className={styles.label} htmlFor="register-email">Email</label>
             <input
-              id="login-email"
+              id="register-email"
               className={styles.input}
               type="email"
               placeholder="admin@notifq.dev"
@@ -69,36 +77,45 @@ export default function LoginPage() {
           </div>
 
           <div className={styles.fieldGroup}>
-            <label className={styles.label} htmlFor="login-password">Password</label>
+            <label className={styles.label} htmlFor="register-password">Password</label>
             <input
-              id="login-password"
+              id="register-password"
               className={styles.input}
               type="password"
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              minLength={6}
+            />
+          </div>
+
+          <div className={styles.fieldGroup}>
+            <label className={styles.label} htmlFor="register-confirm-password">Confirm Password</label>
+            <input
+              id="register-confirm-password"
+              className={styles.input}
+              type="password"
+              placeholder="••••••••"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
             />
           </div>
 
           <button
-            id="login-submit"
+            id="register-submit"
             className={styles.submitButton}
             type="submit"
             disabled={isLoading}
           >
-            {isLoading ? 'Signing in…' : 'Sign In'}
+            {isLoading ? 'Creating account…' : 'Create Account'}
           </button>
 
           <div className={styles.credentials}>
-            <strong>Demo credentials:</strong><br />
-            admin@notifq.dev / admin123
-          </div>
-
-          <div className={styles.credentials}>
-            No account yet?{' '}
-            <Link to="/register" style={{ color: 'var(--accent-primary)', fontWeight: 600 }}>
-              Create one
+            Already have an account?{' '}
+            <Link to="/login" style={{ color: 'var(--accent-primary)', fontWeight: 600 }}>
+              Sign in
             </Link>
           </div>
         </form>
