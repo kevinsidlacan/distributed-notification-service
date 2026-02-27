@@ -5,7 +5,7 @@ import express from 'express';
 import cors from 'cors';
 import campaignRoutes from './routes/campaigns';
 
-const app = express();
+export const app = express();
 const PORT = process.env.PORT || 3001;
 
 // Middleware

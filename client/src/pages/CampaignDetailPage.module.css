@@ -1,0 +1,165 @@
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+  transition: color 0.15s ease;
+}
+
+.backLink:hover {
+  color: var(--accent-primary);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 28px;
+}
+
+.headerInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.meta {
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+
+.btnRetry {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  background: var(--status-error);
+  color: var(--text-inverse);
+  transition: opacity 0.15s ease;
+}
+
+.btnRetry:hover {
+  opacity: 0.9;
+}
+
+.btnRetry:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.statCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  animation: fadeIn 0.3s ease;
+}
+
+.statLabel {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-tertiary);
+  margin-bottom: 8px;
+}
+
+.statValue {
+  font-size: 28px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+}
+
+.statTotal { border-left: 3px solid var(--text-secondary); }
+.statSent { border-left: 3px solid var(--status-success); }
+.statFailed { border-left: 3px solid var(--status-error); }
+.statPending { border-left: 3px solid var(--status-processing); }
+
+.progressSection {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  animation: fadeIn 0.4s ease;
+}
+
+.progressTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+.percentage {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--accent-primary);
+  margin-bottom: 12px;
+}
+
+.percentageLabel {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  font-weight: 400;
+}
+
+.pollingNote {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-tertiary);
+  margin-top: 16px;
+}
+
+.pollingDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--status-processing);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.loading {
+  padding: 48px;
+  text-align: center;
+  color: var(--text-tertiary);
+  font-size: 14px;
+}
+
+.retryToast {
+  margin-top: 16px;
+  padding: 12px 16px;
+  background: var(--status-success-bg);
+  color: var(--status-success);
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  animation: fadeIn 0.3s ease;
+}

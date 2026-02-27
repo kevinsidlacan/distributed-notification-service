@@ -1,0 +1,63 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: capitalize;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.pending {
+  background: var(--status-pending-bg);
+  color: var(--status-pending);
+}
+
+.pending .dot {
+  background: var(--status-pending);
+}
+
+.processing {
+  background: var(--status-processing-bg);
+  color: var(--status-processing);
+}
+
+.processing .dot {
+  background: var(--status-processing);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.completed {
+  background: var(--status-success-bg);
+  color: var(--status-success);
+}
+
+.completed .dot {
+  background: var(--status-success);
+}
+
+.completed_with_failures {
+  background: var(--status-error-bg);
+  color: var(--status-error);
+}
+
+.completed_with_failures .dot {
+  background: var(--status-error);
+}
+
+.failed {
+  background: var(--status-error-bg);
+  color: var(--status-error);
+}
+
+.failed .dot {
+  background: var(--status-error);
+}

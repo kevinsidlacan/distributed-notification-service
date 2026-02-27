@@ -119,6 +119,42 @@ router.get('/:id', async (req: Request<{ id: string }>, res: Response): Promise<
   }
 });
 
+router.post('/:id/retry', async (req: Request<{ id: string }>, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+
+    const failedMessages = await prisma.message.findMany({
+      where: { campaignId: id, status: 'failed' },
+      select: { id: true, recipient: true },
+    });
+
+    if (failedMessages.length === 0) {
+      res.status(400).json({ error: 'No failed messages to retry.' });
+      return;
+    }
+
+    await prisma.message.updateMany({
+      where: { campaignId: id, status: 'failed' },
+      data: { status: 'queued', lastError: null },
+    });
+
+    await prisma.campaign.update({
+      where: { id },
+      data: {
+        status: 'processing',
+        failedCount: { decrement: failedMessages.length },
+      },
+    });
+
+    await enqueueNotifications(id, failedMessages);
+
+    res.json({ retriedCount: failedMessages.length });
+  } catch (error) {
+    console.error('Error retrying failed messages:', error);
+    res.status(500).json({ error: 'Internal server error.' });
+  }
+});
+
 router.get('/', async (_req: Request, res: Response): Promise<void> => {
   try {
     const campaigns = await prisma.campaign.findMany({
