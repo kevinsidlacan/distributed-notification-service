@@ -21,13 +21,17 @@ model Campaign {
 }
 
 model Message {
-  id          String   @id @default(uuid())
+  id          String    @id @default(uuid())
   recipient   String
-  status      String   @default("pending")
-  attempts    Int      @default(0)
+  status      String    @default("pending")
+  attempts    Int       @default(0)
   lastError   String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  // IDEMPOTENCY GUARD: Set to the timestamp of the first successful send.
+  // The worker checks this BEFORE sending. If non-null, the message was
+  // already delivered and the job is a duplicate retry — skip silently.
+  sentAt      DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   campaignId  String
   campaign    Campaign @relation(fields: [campaignId], references: [id])
