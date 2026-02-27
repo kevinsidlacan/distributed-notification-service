@@ -152,9 +152,16 @@ The worker handles `SIGTERM` and `SIGINT` signals, allowing in-flight jobs to co
 To actually deliver notifications, the system implements the **Strategy/Factory Pattern** via `EmailServiceFactory`. This is crucial for avoiding massive AWS bills during load testing.
 
 1. **Mock Email Provider**: Any recipient ending in `@example.com` is routed here. It simulates network latency and a 20% failure rate but does not make any actual network requests.
-2. **AWS SES Provider**: Any real email address provided via the dashboard is routed to the `@aws-sdk/client-ses` integration, which uses `SendEmailCommand` to dispatch genuine emails via AWS Simple Email Service.
+2. **AWS SES Provider**: Any real email address provided via the dashboard is routed to the `@aws-sdk/client-ses` integration.
+    - It utilizes the `SendEmailCommand` from the AWS SDK v3 to dispatch genuine text-based emails.
+    - **Configuration Checklist**: The worker running the SES provider requires specific environment variables to authenticate with AWS:
+        - `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` for IAM user authentication.
+        - `AWS_REGION` (defaults to `us-east-1`).
+        - `FROM_EMAIL`: The verified sender address in SES.
+    - **AWS SES Sandbox Environment**: By default, new AWS accounts are placed in the SES Sandbox. Attempting to send an email to unverified domains or addresses will result in an AWS API error thrown by the integration. Until production access is granted, both the `FROM_EMAIL` and all recipient email addresses must be manually verified within the AWS SES Management Console.
+    - **Error Handling**: Operational or API errors encountered during SES dispatch throw specific exceptions that BullMQ catches, queuing the specific message for automated retries (up to 3 times with exponential backoff).
 
-This provides the ability to simulate 100,000 parallel sends while safely sending exactly 1 real email for verification.
+This architecture provides the ability to simulate 100,000 parallel test sends (via the mock provider) while safely dispatching genuine, verifiable emails strictly to authorized users, fully protecting infrastructure limits and avoiding uncontrolled spend.
 
 ## Project Structure
 
