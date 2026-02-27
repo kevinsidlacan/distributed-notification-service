@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { Prisma } from '@prisma/client';
 import prisma from '../lib/prisma';
+import { enqueueNotifications } from '../lib/queue';
 import { generateRecipients } from '../utils/generateRecipients';
 
 const router = Router();
@@ -10,7 +11,6 @@ interface CreateCampaignBody {
   recipientCount?: number;
 }
 
-// POST /campaigns — Create a new campaign with batch message inserts
 router.post('/', async (req: Request<{}, {}, CreateCampaignBody>, res: Response): Promise<void> => {
   try {
     const { name, recipientCount = 100 } = req.body;
@@ -27,7 +27,7 @@ router.post('/', async (req: Request<{}, {}, CreateCampaignBody>, res: Response)
 
     const recipients = generateRecipients(recipientCount);
 
-    const campaign = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+    const { campaign, messages } = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const newCampaign = await tx.campaign.create({
         data: {
           name,
@@ -36,8 +36,9 @@ router.post('/', async (req: Request<{}, {}, CreateCampaignBody>, res: Response)
         },
       });
 
-      // Batch insert messages in chunks of 1000
+      const createdMessages: { id: string; recipient: string }[] = [];
       const BATCH_SIZE = 1000;
+
       for (let i = 0; i < recipients.length; i += BATCH_SIZE) {
         const batch = recipients.slice(i, i + BATCH_SIZE);
         await tx.message.createMany({
@@ -47,26 +48,38 @@ router.post('/', async (req: Request<{}, {}, CreateCampaignBody>, res: Response)
             status: 'pending',
           })),
         });
+
+        // Collect created message IDs for queue enqueueing
+        const created = await tx.message.findMany({
+          where: { campaignId: newCampaign.id, recipient: { in: batch } },
+          select: { id: true, recipient: true },
+        });
+        createdMessages.push(...created);
       }
 
-      return newCampaign;
+      return { campaign: newCampaign, messages: createdMessages };
+    });
+
+    // Enqueue jobs and mark campaign as processing
+    await enqueueNotifications(campaign.id, messages);
+    await prisma.campaign.update({
+      where: { id: campaign.id },
+      data: { status: 'processing' },
     });
 
     res.status(202).json({
       campaignId: campaign.id,
       name: campaign.name,
       totalMessages: campaign.totalMessages,
-      status: campaign.status,
-      message: 'Campaign created. Messages will be processed shortly.',
+      status: 'processing',
+      message: 'Campaign created and queued for processing.',
     });
-
   } catch (error) {
     console.error('Error creating campaign:', error);
     res.status(500).json({ error: 'Internal server error.' });
   }
 });
 
-// GET /campaigns/:id — Get campaign details with message progress
 router.get('/:id', async (req: Request<{ id: string }>, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
@@ -75,9 +88,7 @@ router.get('/:id', async (req: Request<{ id: string }>, res: Response): Promise<
       where: { id },
       include: {
         _count: {
-          select: {
-            messages: true,
-          },
+          select: { messages: true },
         },
       },
     });
@@ -108,7 +119,6 @@ router.get('/:id', async (req: Request<{ id: string }>, res: Response): Promise<
   }
 });
 
-// GET /campaigns — List all campaigns (most recent first)
 router.get('/', async (_req: Request, res: Response): Promise<void> => {
   try {
     const campaigns = await prisma.campaign.findMany({

@@ -1,35 +1,68 @@
-# docker-compose.yml
 version: '3.8'
 
 services:
-  # --- PostgreSQL Database ---
-  # This is where we store campaigns and message records.
-  # Think of it as your "persistent memory."
   postgres:
-    image: postgres:16-alpine    # Use the official Postgres image (alpine = smaller size)
+    image: postgres:16-alpine
     container_name: notif-postgres
     environment:
-      POSTGRES_USER: dev_user          # The username to connect with
-      POSTGRES_PASSWORD: dev_password  # The password (fine for local dev)
-      POSTGRES_DB: notifications       # The database name to create automatically
+      POSTGRES_USER: dev_user
+      POSTGRES_PASSWORD: dev_password
+      POSTGRES_DB: notifications
     ports:
-      - "5432:5432"   # Maps port 5432 on YOUR machine to port 5432 inside the container
+      - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data  # Persist data even if container restarts
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dev_user -d notifications"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
-  # --- Redis ---
-  # This will be our Message Queue broker (used in Week 2).
-  # For now, we just want it running and ready.
   redis:
     image: redis:7-alpine
     container_name: notif-redis
     ports:
-      - "6379:6379"   # Default Redis port
+      - "6379:6379"
     volumes:
       - redis_data:/var/lib/redis/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
-# Named volumes — Docker manages where this data lives on your disk.
-# You don't need to worry about the path.
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: notif-api
+    ports:
+      - "3001:3001"
+    environment:
+      DATABASE_URL: postgresql://dev_user:dev_password@postgres:5432/notifications
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      PORT: 3001
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    environment:
+      DATABASE_URL: postgresql://dev_user:dev_password@postgres:5432/notifications
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
 volumes:
   postgres_data:
   redis_data:
