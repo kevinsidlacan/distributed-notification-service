@@ -1,13 +1,13 @@
 .badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  border-radius: 20px;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.02em;
-  text-transform: capitalize;
+  border: 1px solid transparent;
 }
 
 .dot {
@@ -18,7 +18,8 @@
 
 .pending {
   background: var(--status-pending-bg);
-  color: var(--status-pending);
+  color: var(--text-primary);
+  border-color: var(--border-medium);
 }
 
 .pending .dot {
@@ -28,16 +29,18 @@
 .processing {
   background: var(--status-processing-bg);
   color: var(--status-processing);
+  border-color: rgba(217, 119, 6, 0.2);
 }
 
 .processing .dot {
   background: var(--status-processing);
-  animation: pulse 1.5s ease-in-out infinite;
+  animation: pulse 1s ease-in-out infinite;
 }
 
 .completed {
   background: var(--status-success-bg);
   color: var(--status-success);
+  border-color: rgba(30, 130, 76, 0.2);
 }
 
 .completed .dot {
@@ -47,6 +50,7 @@
 .completed_with_failures {
   background: var(--status-error-bg);
   color: var(--status-error);
+  border-color: rgba(217, 45, 32, 0.2);
 }
 
 .completed_with_failures .dot {
@@ -56,6 +60,7 @@
 .failed {
   background: var(--status-error-bg);
   color: var(--status-error);
+  border-color: rgba(217, 45, 32, 0.2);
 }
 
 .failed .dot {

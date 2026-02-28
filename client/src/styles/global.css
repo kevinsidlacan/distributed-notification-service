@@ -1,54 +1,55 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap');
 
 :root {
-  /* Warm neutral palette */
-  --bg-primary: #F8F7F4;
+  /* High-end Minimalist Business Palette */
+  --bg-primary: #F7F7F9;
   --bg-card: #FFFFFF;
-  --bg-sidebar: #1A1A1A;
-  --bg-sidebar-hover: #2A2A2A;
-  --bg-input: #F1F0EC;
-  --bg-modal-overlay: rgba(0, 0, 0, 0.4);
+  --bg-sidebar: #FFFFFF;
+  --bg-sidebar-hover: #F2F2F5;
+  --bg-input: #FFFFFF;
+  --bg-modal-overlay: rgba(15, 15, 20, 0.3);
 
-  /* Accent colors */
-  --accent-primary: #D97706;
-  --accent-primary-hover: #B45309;
-  --accent-primary-light: #FEF3C7;
-  --accent-primary-subtle: rgba(217, 119, 6, 0.08);
+  /* Accent colors - Monochrome Obsidian */
+  --accent-primary: #111114;
+  --accent-primary-hover: #2C2C30;
+  --accent-primary-light: #E8E8EB;
+  --accent-primary-subtle: rgba(17, 17, 20, 0.03);
 
-  /* Status colors */
-  --status-success: #059669;
-  --status-success-bg: #ECFDF5;
-  --status-error: #DC2626;
-  --status-error-bg: #FEF2F2;
+  /* Status colors - Refined Muted Tones */
+  --status-success: #1E824C;
+  --status-success-bg: #E8F5EC;
+  --status-error: #D92D20;
+  --status-error-bg: #FEF3F2;
   --status-processing: #D97706;
-  --status-processing-bg: #FFFBEB;
-  --status-pending: #6B7280;
-  --status-pending-bg: #F3F4F6;
+  --status-processing-bg: #FEF7EB;
+  --status-pending: #667085;
+  --status-pending-bg: #F2F4F7;
 
   /* Text */
-  --text-primary: #1E1E1E;
-  --text-secondary: #6B7280;
-  --text-tertiary: #9CA3AF;
+  --text-primary: #101828;
+  --text-secondary: #475467;
+  --text-tertiary: #98A2B3;
   --text-inverse: #FFFFFF;
-  --text-sidebar: #A3A3A3;
-  --text-sidebar-active: #FFFFFF;
+  --text-sidebar: #475467;
+  --text-sidebar-active: #101828;
 
   /* Borders */
-  --border-light: #E8E6E1;
-  --border-medium: #D4D1CA;
+  --border-light: #EAECF0;
+  --border-medium: #D0D5DD;
+  --border-focus: #111114;
 
-  /* Shadows */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.08);
+  /* Shadows - Premium Diffused */
+  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.04);
+  --shadow-md: 0 4px 12px rgba(16, 24, 40, 0.03), 0 1px 2px rgba(16, 24, 40, 0.01);
+  --shadow-lg: 0 12px 32px rgba(16, 24, 40, 0.04), 0 4px 8px rgba(16, 24, 40, 0.02);
+  --shadow-float: 0 24px 48px rgba(16, 24, 40, 0.06);
 
-  /* Spacing */
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-
-  /* Layout */
-  --sidebar-width: 240px;
+  /* Settings */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
+  --sidebar-width: 260px;
 }
 
 *, *::before, *::after {
@@ -58,33 +59,43 @@
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
   background-color: var(--bg-primary);
   color: var(--text-primary);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-image: radial-gradient(circle at 100% 0%, rgba(17, 17, 20, 0.02) 0%, transparent 40%);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Outfit', sans-serif;
+  letter-spacing: -0.02em;
 }
 
 button {
-  font-family: inherit;
+  font-family: 'Manrope', sans-serif;
   cursor: pointer;
   border: none;
   outline: none;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 input, select, textarea {
-  font-family: inherit;
+  font-family: 'Manrope', sans-serif;
 }
 
 a {
   text-decoration: none;
   color: inherit;
+  transition: color 0.2s ease;
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.6; }
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(0.95); }
 }
 
 @keyframes fadeIn {
@@ -93,11 +104,11 @@ a {
 }
 
 @keyframes slideIn {
-  from { opacity: 0; transform: scale(0.96); }
-  to { opacity: 1; transform: scale(1); }
+  from { opacity: 0; transform: scale(0.98) translateY(12px); filter: blur(4px); }
+  to { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
 }
 
 @keyframes overlayIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from { opacity: 0; backdrop-filter: blur(0); }
+  to { opacity: 1; backdrop-filter: blur(8px); }
 }

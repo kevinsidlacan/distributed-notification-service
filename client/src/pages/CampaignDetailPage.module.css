@@ -1,165 +1,193 @@
 .backLink {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  font-weight: 500;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
   color: var(--text-secondary);
-  margin-bottom: 20px;
-  transition: color 0.15s ease;
+  margin-bottom: 32px;
+  padding: 8px 16px 8px 0;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .backLink:hover {
   color: var(--accent-primary);
+  transform: translateX(-4px);
 }
 
 .header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 28px;
+  margin-bottom: 48px;
 }
 
 .headerInfo {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 16px;
 }
 
 .titleRow {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 20px;
 }
 
 .title {
-  font-size: 22px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 40px;
   font-weight: 700;
   color: var(--text-primary);
+  letter-spacing: -0.02em;
 }
 
 .meta {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--text-tertiary);
+  font-weight: 500;
 }
 
 .btnRetry {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 18px;
+  gap: 10px;
+  padding: 12px 24px;
   font-size: 14px;
   font-weight: 600;
-  border-radius: var(--radius-md);
-  background: var(--status-error);
-  color: var(--text-inverse);
-  transition: opacity 0.15s ease;
+  border-radius: var(--radius-pill);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border-medium);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
 }
 
 .btnRetry:hover {
-  opacity: 0.9;
+  background: var(--status-error-bg);
+  color: var(--status-error);
+  border-color: var(--status-error);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
 }
 
 .btnRetry:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .statsGrid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  margin-bottom: 28px;
+  gap: 24px;
+  margin-bottom: 48px;
 }
 
 .statCard {
   background: var(--bg-card);
   border: 1px solid var(--border-light);
   border-radius: var(--radius-lg);
-  padding: 20px;
-  animation: fadeIn 0.3s ease;
+  padding: 32px 24px;
+  box-shadow: var(--shadow-sm);
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .statLabel {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-tertiary);
-  margin-bottom: 8px;
+  color: var(--text-secondary);
 }
 
 .statValue {
-  font-size: 28px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 48px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   color: var(--text-primary);
+  letter-spacing: -0.02em;
 }
 
-.statTotal { border-left: 3px solid var(--text-secondary); }
-.statSent { border-left: 3px solid var(--status-success); }
-.statFailed { border-left: 3px solid var(--status-error); }
-.statPending { border-left: 3px solid var(--status-processing); }
+.statSent .statValue { color: var(--status-success); }
+.statFailed .statValue { color: var(--status-error); }
+.statPending .statValue { color: var(--status-processing); }
 
 .progressSection {
   background: var(--bg-card);
   border: 1px solid var(--border-light);
   border-radius: var(--radius-lg);
-  padding: 20px;
-  animation: fadeIn 0.4s ease;
+  padding: 40px;
+  box-shadow: var(--shadow-sm);
+  animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .progressTitle {
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 18px;
+  font-weight: 700;
   color: var(--text-primary);
-  margin-bottom: 16px;
+  margin-bottom: 24px;
+  letter-spacing: -0.01em;
 }
 
 .percentage {
-  font-size: 32px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 64px;
   font-weight: 700;
-  color: var(--accent-primary);
-  margin-bottom: 12px;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
 }
 
 .percentageLabel {
-  font-size: 13px;
-  color: var(--text-tertiary);
-  font-weight: 400;
+  font-family: 'Manrope', sans-serif;
+  font-size: 16px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  letter-spacing: 0;
 }
 
 .pollingNote {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  color: var(--text-tertiary);
-  margin-top: 16px;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--status-processing);
+  margin-top: 32px;
+  font-weight: 500;
 }
 
 .pollingDot {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: var(--status-processing);
+  box-shadow: 0 0 0 4px var(--status-processing-bg);
   animation: pulse 1.5s ease-in-out infinite;
 }
 
 .loading {
-  padding: 48px;
+  padding: 80px;
   text-align: center;
   color: var(--text-tertiary);
-  font-size: 14px;
+  font-size: 16px;
+  font-weight: 500;
 }
 
 .retryToast {
-  margin-top: 16px;
-  padding: 12px 16px;
+  margin-top: 32px;
+  padding: 16px 20px;
   background: var(--status-success-bg);
+  border-left: 4px solid var(--status-success);
   color: var(--status-success);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   animation: fadeIn 0.3s ease;
 }
