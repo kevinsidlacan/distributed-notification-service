@@ -7,8 +7,11 @@ delete-campaign.js
 
 # AWS & Terraform Secrets
 *.pem
+.env
 .env.*
 .terraform/
 *.tfstate
 *.tfstate.backup
 .aws/
+terraform.tfvars
+*.tfvars

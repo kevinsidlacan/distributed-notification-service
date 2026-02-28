@@ -1,11 +1,14 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+import process from 'process';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  const email = 'admin@notifq.dev';
-  const password = 'admin123';
+  const email = process.env.ADMIN_EMAIL || 'admin@notifq.dev';
+  const password = process.env.ADMIN_PASSWORD || 'admin123';
+
+  console.log(`Checking for admin user: ${email}`);
 
   const existing = await prisma.admin.findUnique({ where: { email } });
   if (existing) {

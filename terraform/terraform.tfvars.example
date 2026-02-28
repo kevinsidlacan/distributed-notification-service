@@ -1,0 +1,19 @@
+# Rename this file to `terraform.tfvars` (which is ignored by git)
+# and fill in your actual values before running `terraform apply`.
+
+# The URL of the GitHub repository Terraform should clone onto the EC2 server
+# IMPORTANT: Include the Personal Access Token if it is a private repo!
+# Format: https://<github-token>@github.com/Username/distributed-notification-service.git
+github_repo_url = "https://github.com/kevinsidlacan/distributed-notification-service.git"
+
+# Your Backend JWT Secret for verifying Admin logins
+jwt_secret = "your_super_secret_production_string_here"
+
+# The default Admin User that will be created on database initialization
+admin_email    = "admin@notifq.dev"
+admin_password = "super_secure_password"
+
+# [Optional] AWS SES Credentials for sending real emails
+aws_ses_access_key = ""
+aws_ses_secret_key = ""
+aws_ses_from_email = ""
