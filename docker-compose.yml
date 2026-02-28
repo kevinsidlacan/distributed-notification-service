@@ -64,6 +64,17 @@ services:
       redis:
         condition: service_healthy
 
+  client:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    container_name: notif-client
+    ports:
+      - "80:80"
+    depends_on:
+      api:
+        condition: service_started
+
 volumes:
   postgres_data:
   redis_data:
