@@ -7,20 +7,14 @@ import { EmailServiceFactory } from '../services/email/EmailServiceFactory';
 // The old sendNotification was moved to MockEmailProvider.
 
 export async function updateCampaignProgress(campaignId: string): Promise<void> {
-  const pendingCount = await prisma.message.count({
-    where: { campaignId, status: 'pending' },
+  const campaign = await prisma.campaign.findUnique({
+    where: { id: campaignId },
   });
 
-  const queuedCount = await prisma.message.count({
-    where: { campaignId, status: 'queued' },
-  });
+  if (!campaign) return;
 
-  if (pendingCount === 0 && queuedCount === 0) {
-    const campaign = await prisma.campaign.findUnique({
-      where: { id: campaignId },
-    });
-
-    if (campaign) {
+  if (campaign.sentCount + campaign.failedCount >= campaign.totalMessages) {
+    if (campaign.status === 'processing' || campaign.status === 'pending') {
       const status = campaign.failedCount > 0 ? 'completed_with_failures' : 'completed';
       await prisma.campaign.update({
         where: { id: campaignId },

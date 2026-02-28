@@ -88,7 +88,7 @@ router.post('/', requireAuth, async (req: Request<{}, {}, CreateCampaignBody>, r
   }
 });
 
-router.get('/:id', async (req: Request<{ id: string }>, res: Response): Promise<void> => {
+router.get('/:id', requireAuth, async (req: Request<{ id: string }>, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
 
@@ -163,7 +163,7 @@ router.post('/:id/retry', requireAuth, async (req: Request<{ id: string }>, res:
   }
 });
 
-router.get('/', async (_req: Request, res: Response): Promise<void> => {
+router.get('/', requireAuth, async (_req: Request, res: Response): Promise<void> => {
   try {
     const campaigns = await prisma.campaign.findMany({
       orderBy: { createdAt: 'desc' },
@@ -178,3 +178,4 @@ router.get('/', async (_req: Request, res: Response): Promise<void> => {
 });
 
 export default router;
+

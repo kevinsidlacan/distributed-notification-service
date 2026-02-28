@@ -28,13 +28,27 @@ export interface CampaignDetail extends Campaign {
 }
 
 export async function getCampaigns(): Promise<Campaign[]> {
-  const res = await fetch(`${API_BASE}/campaigns`);
+  const res = await fetch(`${API_BASE}/campaigns`, {
+    headers: getAuthHeaders(),
+  });
+  if (res.status === 401) {
+    localStorage.removeItem('auth_token');
+    window.location.href = '/login';
+    throw new Error('Session expired. Please log in again.');
+  }
   if (!res.ok) throw new Error('Failed to fetch campaigns');
   return res.json();
 }
 
 export async function getCampaignById(id: string): Promise<CampaignDetail> {
-  const res = await fetch(`${API_BASE}/campaigns/${id}`);
+  const res = await fetch(`${API_BASE}/campaigns/${id}`, {
+    headers: getAuthHeaders(),
+  });
+  if (res.status === 401) {
+    localStorage.removeItem('auth_token');
+    window.location.href = '/login';
+    throw new Error('Session expired. Please log in again.');
+  }
   if (!res.ok) throw new Error('Failed to fetch campaign');
   return res.json();
 }
@@ -67,3 +81,4 @@ export async function retryFailedMessages(campaignId: string): Promise<{ retried
   if (!res.ok) throw new Error('Failed to retry messages');
   return res.json();
 }
+
