@@ -71,7 +71,7 @@ resource "aws_instance" "app_server" {
               chown -R ec2-user:ec2-user /home/ec2-user/app
 
               # Start the stack!
-              docker compose up -d
+              docker compose up -d --build
               EOF
 
   tags = {
