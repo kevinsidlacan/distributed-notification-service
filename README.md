@@ -1,6 +1,6 @@
 # Distributed Notification Service
 
-A robust, full-stack application designed to demonstrate Senior-level architectural patterns, including background job processing, queueing, and secure API design.
+A robust, full-stack application designed to demonstrate architectural patterns, including background job processing, queueing, and secure API design.
 
 ## Architecture
 - **Frontend:** React (Vite) + Nginx SPA Routing
